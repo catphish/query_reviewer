@@ -12,14 +12,16 @@ module QueryReviewer
       base.helper_method :query_review_output
     end
 
-    def query_review_output(ajax = false, total_time = nil)
+    def query_review_output(type, total_time = nil)
       faux_view = QueryViewBase.new([File.join(File.dirname(__FILE__), "views")], {}, self)
       queries = Thread.current["queries"]
       queries.analyze!
       faux_view.instance_variable_set("@queries", queries)
       faux_view.instance_variable_set("@total_time", total_time)
-      if ajax
+      if type == :ajax
         js = faux_view.render(:partial => "/box_ajax.js")
+      elsif type == :log
+        txt = faux_view.render(:partial => "/log_review")
       else
         html = faux_view.render(:partial => "/box")
       end
@@ -29,15 +31,15 @@ module QueryReviewer
       if request.xhr?
         if cookies["query_review_enabled"]
           if !response.content_type || response.content_type.include?("text/html")
-            response.body += "<script type=\"text/javascript\">"+query_review_output(true, total_time)+"</script>"
+            response.body += "<script type=\"text/javascript\">"+query_review_output(:ajax, total_time)+"</script>"
           elsif response.content_type && response.content_type.include?("text/javascript")
-            response.body += ";\n"+query_review_output(true, total_time)
+            response.body += ";\n"+query_review_output(:ajax, total_time)
           end
         end
       else
         if response.body.is_a?(String) && response.body.match(/<\/body>/i) && Thread.current["queries"]
           idx = (response.body =~ /<\/body>/i)
-          html = query_review_output(false, total_time)
+          html = query_review_output(nil, total_time)
           response.body.insert(idx, html)
         end
       end
@@ -49,6 +51,7 @@ module QueryReviewer
       r = perform_action_without_query_review
       t2 = Time.now
       add_query_output_to_view(t2 - t1)
+      QueryReviewer.logger.info(query_review_output(:log, total_time))
       r
     end
 

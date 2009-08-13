@@ -5,6 +5,9 @@ require 'yaml'
 
 module QueryReviewer
   CONFIGURATION = {}
+  
+  @@logger = nil
+  mattr_accessor :logger
     
   def self.load_configuration
     default_config = YAML::load(ERB.new(IO.read(File.join(File.dirname(__FILE__), "..", "query_reviewer_defaults.yml"))).result)
@@ -21,7 +24,11 @@ module QueryReviewer
     end
     
     if enabled?
-      begin      
+      begin
+        if CONFIGURATION["log_file"] && CONFIGURATION["log_queries"]
+          @@logger = Logger.new(File.join(Rails.root, CONFIGURATION["log_file"]))
+          @@logger.lever = Logger::INFO
+        end
         CONFIGURATION["uv"] ||= !Gem.searcher.find("uv").nil?
         if CONFIGURATION["uv"]
           require "uv"

@@ -46,7 +46,7 @@ module QueryReviewer
       end
 
       def ignore_hash?(h)
-      	(@controller.send(:cookies)["query_review_ignore_list"] || "").split(",").include?(h.to_s)
+        (@controller.send(:cookies)["query_review_ignore_list"] || "").split(",").include?(h.to_s)
       end
 
       def queries_with_warnings
@@ -91,6 +91,48 @@ module QueryReviewer
         else
           "<span title=\"#{title}\">#{"%.3f" % duration}</span>"
         end
+      end
+      
+      def format_column(value, column, data, format = "s")
+        max_width = data.max {|a, b| a.send(column.to_sym).to_s.length <=> b.send(column.to_sym).to_s.length }
+        "%-#{max_width}#{format}" % value
+      end
+      
+      def text_row(subquery, subqueries)
+        row = []
+        row << format_column(subquery.table, :table, subqueries)
+        row << format_column(subquery.select_type, :select_type, subqueries)
+        row << format_column(subquery.query_type, :query_type, subqueries)
+        row << format_column(subquery.extra, :extra, subqueries)
+        row << format_column(subquery.possible_keys, :possible_keys, subqueries)
+        row << format_column(subquery.key, :key, subqueries)
+        row << format_column(subquery.key_len, :key_len, subqueries, "d")
+        row << format_column(subquery.ref, :ref, subqueries)
+        row << format_column(subquery.rows, :rows, subqueries, "d")
+        text = row.join(' | ')
+        return "   | #{text} |"
+      end
+      
+      def subqueires_table(subqueries)
+        rows = []
+        hrow = []
+        hrow << format_column("table", :table, subqueries)
+        hrow << format_column("select_type", :select_type, subqueries)
+        hrow << format_column("type", :query_type, subqueries)
+        hrow << format_column("extra", :extra, subqueries)
+        hrow << format_column("possible_keys", :possible_keys, subqueries)
+        hrow << format_column("key", :key, subqueries)
+        hrow << format_column("key_length", :key_len, subqueries)
+        hrow << format_column("ref", :ref, subqueries)
+        hrow << format_column("rows", :rows, subqueries)
+        header = hrow.join(' | ')
+        rows << "   | #{header} |"
+        
+        subqueries.each do |subquery|
+          rows << text_row(subquery, subqueries)
+        end
+        
+        rows.join("\n")
       end
     end
   end
