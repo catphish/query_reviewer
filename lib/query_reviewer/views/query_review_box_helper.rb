@@ -93,9 +93,17 @@ module QueryReviewer
         end
       end
       
-      def format_column(value, column, data, format = "s")
-        max_width = data.max {|a, b| a.send(column.to_sym).to_s.length <=> b.send(column.to_sym).to_s.length }
-        "%-#{max_width}#{format}" % value
+      EXPLN_COLUMNS = {
+        :table => "table", :select_type => 'select type', :query_type => 'type', :extra => 'extra',
+        :possible_keys => 'possible keys', :key => "key", :key_len => "key length",
+        :ref => "ref", :rows => "rows"
+      }
+      
+      def format_column(value, column, data)
+        column_widths = data.map{|sq| sq.send(column.to_sym).to_s.length}
+        column_widths << EXPLN_COLUMNS[column].length
+        max_width = column_widths.max
+        "%-#{max_width}s" % value
       end
       
       def text_row(subquery, subqueries)
@@ -106,9 +114,9 @@ module QueryReviewer
         row << format_column(subquery.extra, :extra, subqueries)
         row << format_column(subquery.possible_keys, :possible_keys, subqueries)
         row << format_column(subquery.key, :key, subqueries)
-        row << format_column(subquery.key_len, :key_len, subqueries, "d")
+        row << format_column(subquery.key_len, :key_len, subqueries)
         row << format_column(subquery.ref, :ref, subqueries)
-        row << format_column(subquery.rows, :rows, subqueries, "d")
+        row << format_column(subquery.rows, :rows, subqueries)
         text = row.join(' | ')
         return "   | #{text} |"
       end
@@ -116,15 +124,15 @@ module QueryReviewer
       def subqueires_table(subqueries)
         rows = []
         hrow = []
-        hrow << format_column("table", :table, subqueries)
-        hrow << format_column("select_type", :select_type, subqueries)
-        hrow << format_column("type", :query_type, subqueries)
-        hrow << format_column("extra", :extra, subqueries)
-        hrow << format_column("possible_keys", :possible_keys, subqueries)
-        hrow << format_column("key", :key, subqueries)
-        hrow << format_column("key_length", :key_len, subqueries)
-        hrow << format_column("ref", :ref, subqueries)
-        hrow << format_column("rows", :rows, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:table], :table, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:select_type], :select_type, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:query_type], :query_type, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:table], :extra, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:possible_keys], :possible_keys, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:key], :key, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:key_len], :key_len, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:ref], :ref, subqueries)
+        hrow << format_column(EXPLN_COLUMNS[:rows], :rows, subqueries)
         header = hrow.join(' | ')
         rows << "   | #{header} |"
         
