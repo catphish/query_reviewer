@@ -51,7 +51,7 @@ module QueryReviewer
       r = perform_action_without_query_review
       t2 = Time.now
       add_query_output_to_view(t2 - t1)
-      QueryReviewer.logger.info(query_review_output(:log, total_time))
+      QueryReviewer.logger.info(query_review_output(:log, t2 - t1))
       r
     end
 
