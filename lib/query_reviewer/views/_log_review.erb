@@ -23,7 +23,7 @@
       - <%= warning_no_query.desc %>
   <%- end -%>
   <%- queries_with_warnings_sorted_nonignored.each do |query_with_warning| -%>
-    * [Severity: <%= query_with_warning.severity %> out of 10] - <%- if query_with_warning.count > 1 %><%= query_with_warning.count  -%> identical queries - <%- end -%> Table <%= (query_with_warning.warnings.detect {|w| !w.table.blank? } || query_with_warning.warnings.last).table %>:
+    * [Severity: <%= query_with_warning.max_severity %> out of 10] - <%- if query_with_warning.count > 1 %><%= query_with_warning.count  -%> identical queries - <%- end -%> Table <%= (query_with_warning.warnings.detect {|w| !w.table.blank? } || query_with_warning.warnings.last).table %>:
     <%- query_with_warning.warnings.sort{|a,b| a.severity <=> b.severity}.reverse.each do |warn| -%>
       -- <%= warn.problem %> (<%= warn.desc%>)
     <%- end -%>
