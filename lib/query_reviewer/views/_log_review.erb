@@ -1,4 +1,4 @@
-[<%= Time.now.to_s(:db) %>] <%= controller.name %>#<%= controller.action_name %>
+[<%= Time.now.to_s(:db) %>] <%= controller.class.name %>#<%= controller.action_name %>
 
   Total queries:       <%= @queries.query_count %>
   <%- if @total_time -%>
