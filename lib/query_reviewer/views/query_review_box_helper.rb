@@ -85,11 +85,11 @@ module QueryReviewer
         title = query.duration_stats
         duration = query.duration
         if duration > QueryReviewer::CONFIGURATION["critical_duration_threshold"]
-          "<span style=\"color: #{severity_color(9)}\" title=\"#{title}\">#{"%.3f" % duration}</span>"
+          "<span style=\"color: #{severity_color(9)}\" title=\"#{title}\">#{"%.3f" % duration}</span>".html_safe
         elsif duration > QueryReviewer::CONFIGURATION["warn_duration_threshold"]
-          "<span style=\"color: #{severity_color(QueryReviewer::CONFIGURATION["critical_severity"])}\" title=\"#{title}\">#{"%.3f" % duration}</span>"
+          "<span style=\"color: #{severity_color(QueryReviewer::CONFIGURATION["critical_severity"])}\" title=\"#{title}\">#{"%.3f" % duration}</span>".html_safe
         else
-          "<span title=\"#{title}\">#{"%.3f" % duration}</span>"
+          "<span title=\"#{title}\">#{"%.3f" % duration}</span>".html_safe
         end
       end
     end
