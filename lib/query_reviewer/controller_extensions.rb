@@ -18,6 +18,7 @@ module QueryReviewer
       queries.analyze!
       faux_view.instance_variable_set("@queries", queries)
       faux_view.instance_variable_set("@total_time", total_time)
+      
       if type == :ajax
         js = faux_view.render(:partial => "/box_ajax.js")
       elsif type == :log
