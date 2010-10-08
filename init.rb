@@ -3,7 +3,10 @@
 require 'query_reviewer'
 
 if QueryReviewer.enabled?
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.send(:include, QueryReviewer::MysqlAdapterExtensions)
+  ActiveRecord::Base
+  adapter_class = ActiveRecord::ConnectionAdapters::MysqlAdapter  if defined? ActiveRecord::ConnectionAdapters::MysqlAdapter
+  adapter_class = ActiveRecord::ConnectionAdapters::Mysql2Adapter if defined? ActiveRecord::ConnectionAdapters::Mysql2Adapter
+  adapter_class.send(:include, QueryReviewer::MysqlAdapterExtensions)
   ActionController::Base.send(:include, QueryReviewer::ControllerExtensions)
   Array.send(:include, QueryReviewer::ArrayExtensions)
   

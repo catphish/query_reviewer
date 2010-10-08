@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), "views", "query_review_box_helper")
 
+require "action_view"
 module QueryReviewer
   module ControllerExtensions
     class QueryViewBase < ActionView::Base
@@ -7,7 +8,7 @@ module QueryReviewer
     end
 
     def self.included(base)
-      base.alias_method_chain :perform_action, :query_review if QueryReviewer::CONFIGURATION["inject_view"]
+      base.alias_method_chain :process_action, :query_review if QueryReviewer::CONFIGURATION["inject_view"]
       base.alias_method_chain :process, :query_review
       base.helper_method :query_review_output
     end
@@ -46,19 +47,19 @@ module QueryReviewer
       end
     end
 
-    def perform_action_with_query_review
+    def process_action_with_query_review(*args)
       Thread.current["query_reviewer_enabled"] = cookies["query_review_enabled"]
       t1 = Time.now
-      r = perform_action_without_query_review
+      r = process_action_without_query_review(*args)
       t2 = Time.now
       add_query_output_to_view(t2 - t1)
       QueryReviewer.logger.info(query_review_output(:log, t2 - t1))
       r
     end
 
-    def process_with_query_review(request, response, method = :perform_action, *arguments) #:nodoc:
+    def process_with_query_review(*args)
       Thread.current["queries"] = SqlQueryCollection.new
-      process_without_query_review(request, response, method, *arguments)
+      process_without_query_review(*args)
     end
   end
 end
