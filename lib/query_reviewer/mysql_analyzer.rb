@@ -18,15 +18,15 @@ module QueryReviewer
 
     def analyze_query_type!
       case query_type
-      when "system", "const", "eq_ref":
+      when "system", "const", "eq_ref"
         praise("Yay")
-      when "ref", "ref_or_null", "range", "index_merge":
+      when "ref", "ref_or_null", "range", "index_merge"
         praise("Not bad eh...")
-      when "unique_subquery", "index_subquery":
+      when "unique_subquery", "index_subquery"
         #NOT SURE
-      when "index":
+      when "index"
         warn(:severity => 8, :field => "query_type", :desc => "Full index tree scan (slightly faster than a full table scan)") unless !extra.include?("using where")
-      when "all":
+      when "all"
         warn(:severity => 9, :field => "query_type", :desc => "Full table scan") unless !extra.include?("using where")
       end
     end
