@@ -13,7 +13,7 @@ module QueryReviewer
       base.helper_method :query_review_output
     end
 
-    def query_review_output(type, total_time = nil)
+    def query_review_output(type = nil, total_time = nil)
       faux_view = QueryViewBase.new([File.join(File.dirname(__FILE__), "views")], {}, self)
       queries = Thread.current["queries"]
       queries.analyze!
