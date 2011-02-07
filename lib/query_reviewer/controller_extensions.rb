@@ -19,7 +19,6 @@ module QueryReviewer
       queries.analyze!
       faux_view.instance_variable_set("@queries", queries)
       faux_view.instance_variable_set("@total_time", total_time)
-      
       if type == :ajax
         js = faux_view.render(:partial => "/box_ajax.js")
       elsif type == :log
@@ -42,7 +41,7 @@ module QueryReviewer
         if response.body.is_a?(String) && response.body.match(/<\/body>/i) && Thread.current["queries"]
           idx = (response.body =~ /<\/body>/i)
           html = query_review_output(nil, total_time)
-          response.body.insert(idx, html)
+          response.body = response.body.insert(idx, html)
         end
       end
     end
