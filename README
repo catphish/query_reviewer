@@ -1,5 +1,6 @@
 QueryReviewer
 =============
+(This version has been modified to work with Rails 3)
 
 QueryReviewer is an advanced SQL query analyzer.  It accomplishes the following goals:
 
